@@ -78,6 +78,7 @@ jobs:
               from main import app
 
               assert app is not None
+          PY
 
       - name: Run FastAPI tests when present
         shell: bash

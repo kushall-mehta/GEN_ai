@@ -1,3 +1,4 @@
+import logging
 import re
 import uuid
 
@@ -9,6 +10,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import FitnessProfileForm
 from .models import FitnessProfile, WorkoutPlan
+
+
+logger = logging.getLogger(__name__)
+
+
+def _chat_error_response(request, profile, message, status):
+    messages.error(request, message)
+    return render(
+        request,
+        "fitness/chat.html",
+        {
+            "profile": profile,
+            "pending_workout": request.session.get("pending_workout"),
+        },
+        status=status,
+    )
 
 
 def _workout_title(content):
@@ -122,22 +139,86 @@ def fitness_chat(request):
             request.session["fitness_session_id"] = session_id
 
         # Send user message + fitness profile to FastAPI
-        response = requests.post(
-            settings.AI_API_URL,
+        try:
+            response = requests.post(
+                settings.AI_API_URL,
+                json={
+                    "session_id": session_id,
+                    "message": message,
+                    "age": profile.age,
+                    "height": profile.height,
+                    "weight": profile.weight,
+                    "goal": profile.goal,
+                    "activity_level": profile.activity_level,
+                    "experience_level": profile.experience_level,
+                },
+                timeout=(5, 45),
+            )
+            response.raise_for_status()
+        except requests.Timeout:
+            logger.warning("AI API request timed out.")
+            return _chat_error_response(
+                request,
+                profile,
+                "The AI coach took too long to respond. Please try again.",
+                504,
+            )
+        except requests.RequestException as exc:
+            upstream_status = getattr(getattr(exc, "response", None), "status_code", None)
+            logger.warning(
+                "AI API request failed (status=%s, error=%s).",
+                upstream_status,
+                type(exc).__name__,
+            )
+            return _chat_error_response(
+                request,
+                profile,
+                "The AI coach is temporarily unavailable. Please try again.",
+                502,
+            )
 
-            json={
-                "session_id": session_id,
-                "message": message,
-                "age": profile.age,
-                "height": profile.height,
-                "weight": profile.weight,
-                "goal": profile.goal,
-                "activity_level": profile.activity_level,
-                "experience_level": profile.experience_level,
-            }
-        )
+        content_type = response.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
+        if content_type != "application/json" and not content_type.endswith("+json"):
+            logger.warning(
+                "AI API returned a non-JSON response (status=%s, content_type=%s).",
+                response.status_code,
+                content_type or "missing",
+            )
+            return _chat_error_response(
+                request,
+                profile,
+                "The AI coach returned an unexpected response. Please try again.",
+                502,
+            )
 
-        data = response.json()
+        try:
+            data = response.json()
+        except requests.exceptions.JSONDecodeError:
+            logger.warning(
+                "AI API returned invalid JSON (status=%s, content_type=%s).",
+                response.status_code,
+                content_type,
+            )
+            return _chat_error_response(
+                request,
+                profile,
+                "The AI coach returned an invalid response. Please try again.",
+                502,
+            )
+
+        if (
+            not isinstance(data, dict)
+            or not isinstance(data.get("message"), str)
+            or not isinstance(data.get("history", []), list)
+        ):
+            logger.warning("AI API returned an unexpected JSON response structure.")
+            return _chat_error_response(
+                request,
+                profile,
+                "The AI coach returned an unexpected response. Please try again.",
+                502,
+            )
+
         answer = data.get("message")
         if data.get("intent") == "workout" and isinstance(answer, str):
             request.session["pending_workout"] = {
