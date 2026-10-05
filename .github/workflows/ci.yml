@@ -83,24 +83,7 @@ jobs:
         shell: bash
         run: |
           if find . -type f \( -name 'test_*.py' -o -name '*_test.py' \) -print -quit | grep -q .; then
-            python - <<'PY'
-            import sys
-            import unittest
-            from types import ModuleType
-            from unittest.mock import patch
-
-            import langchain_postgres
-
-            retriever = ModuleType("rag.retriever")
-            retriever.get_retriever = lambda category: None
-            sys.modules["rag.retriever"] = retriever
-
-            with patch.object(langchain_postgres, "PGVector"):
-                suite = unittest.defaultTestLoader.discover(".")
-                result = unittest.TextTestRunner(verbosity=2).run(suite)
-
-            sys.exit(not result.wasSuccessful())
-            PY
+            python -m unittest discover -v
           else
             echo "No FastAPI tests found; skipping."
           fi
