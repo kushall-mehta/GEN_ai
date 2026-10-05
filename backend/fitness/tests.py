@@ -86,3 +86,57 @@ class WorkoutSaveFlowTests(TestCase):
         self.assertRedirects(response, reverse("fitness_chat"))
         self.assertFalse(WorkoutPlan.objects.filter(user=self.user).exists())
         self.assertNotIn("pending_workout", self.client.session)
+
+    @patch("fitness.views.requests.post")
+    def test_ai_markdown_history_is_formatted_and_raw_html_is_escaped(self, post_request):
+        answer = (
+            "# Diet Plan\n\n"
+            "A simple plan for the day.\n\n"
+            "## Breakfast\n\n"
+            "- **Protein:** eggs\n"
+            "* Oats and fruit\n\n"
+            "<script>alert(1)</script>\n\n"
+            "[unsafe](javascript:alert(1))"
+        )
+        post_request.return_value.json.return_value = {
+            "message": answer,
+            "intent": "diet",
+            "history": [
+                {"role": "user", "content": "Suggest a diet"},
+                {"role": "assistant", "content": answer},
+            ],
+        }
+
+        response = self.client.post(
+            reverse("fitness_chat"),
+            {"message": "Suggest a diet"},
+        )
+
+        self.assertContains(response, "<h1>Diet Plan</h1>", html=False)
+        self.assertContains(response, "<h2>Breakfast</h2>", html=False)
+        self.assertContains(response, "<li><strong>Protein:</strong> eggs</li>", html=False)
+        self.assertContains(response, "<li>Oats and fruit</li>", html=False)
+        self.assertContains(response, 'class="coach-mark"', html=False)
+        self.assertContains(response, "Suggest a diet")
+        self.assertNotContains(response, "**Protein:**", html=False)
+        self.assertNotContains(response, "- **Protein:**", html=False)
+        self.assertContains(response, "&lt;script&gt;alert(1)&lt;/script&gt;", html=False)
+        self.assertNotContains(response, "<script>alert(1)</script>", html=False)
+        self.assertNotContains(response, 'href="javascript:', html=False)
+        self.assertContains(response, "A simple plan for the day.")
+
+    @patch("fitness.views.requests.post")
+    def test_ai_response_without_history_is_formatted(self, post_request):
+        post_request.return_value.json.return_value = {
+            "message": "## Recovery\n\n**Hydrate:** drink water.",
+            "intent": "fitness",
+            "history": [],
+        }
+
+        response = self.client.post(
+            reverse("fitness_chat"),
+            {"message": "How should I recover?"},
+        )
+
+        self.assertContains(response, "<h2>Recovery</h2>", html=False)
+        self.assertContains(response, "<strong>Hydrate:</strong>", html=False)

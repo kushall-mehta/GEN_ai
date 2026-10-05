@@ -180,21 +180,38 @@ h3{font-size:1.5rem;line-height:1.05}
 .ctx li{padding:.2rem .75rem;border:1.5px solid #5B6573;border-radius:99px;font-size:.85rem;font-weight:500}
 .thread{flex:1;overflow-y:auto;width:min(760px,100% - 2.5rem);margin-inline:auto;padding-block:1.5rem;display:flex;flex-direction:column;gap:1rem;scroll-behavior:smooth}
 .bubble{position:relative;max-width:88%;padding:.8rem 1.1rem;border-radius:var(--r);background:var(--paper);border:2px solid var(--line);border-left:6px solid var(--tape)}
+.bubble.coach{max-width:94%;align-self:flex-start;border-left-color:var(--cobalt);box-shadow:0 5px 18px rgba(18,22,29,.06)}
 .bubble small{display:block;font-weight:700;color:var(--steel);margin-bottom:.2rem}
 .bubble.me{align-self:flex-end;background:var(--cobalt);border-color:var(--cobalt);color:#fff}
 .bubble.me small{color:#F1F2F4}
+.coach-mark{display:inline-grid;place-items:center;width:1.35rem;height:1.35rem;margin-right:.35rem;border-radius:50%;background:var(--cobalt);color:#fff;font-size:.68rem;line-height:1;vertical-align:middle}
 .txt{white-space:pre-wrap;overflow-wrap:anywhere}
 .txt.done{white-space:normal}
 .txt p+p,.txt p+ul,.txt p+ol,.txt ul+p,.txt ol+p{margin-top:.6rem}
 .txt ul,.txt ol{padding-left:1.3rem}
 .txt li+li{margin-top:.25rem}
+.coach-content{white-space:normal;line-height:1.75}
+.coach-content h1,.coach-content h2,.coach-content h3,.coach-content h4,.coach-content h5,.coach-content h6{margin:1.25rem 0 .55rem;color:var(--ink);line-height:1.15;text-transform:none;letter-spacing:0}
+.coach-content h1{font-size:1.55rem}
+.coach-content h2{font-size:1.3rem}
+.coach-content h3,.coach-content h4,.coach-content h5,.coach-content h6{font-size:1.08rem}
+.coach-content>*:first-child{margin-top:0}
+.coach-content p{margin:.65rem 0}
+.coach-content ul,.coach-content ol{padding-left:1.5rem;margin:.55rem 0}
+.coach-content li{padding-left:.2rem}
+.coach-content li+li{margin-top:.35rem}
+.coach-content strong{color:var(--ink);font-weight:750}
+.coach-content code{padding:.12rem .35rem;border-radius:4px;background:var(--chalk);font-size:.9em}
+.coach-content blockquote{margin:.8rem 0;padding:.35rem .85rem;border-left:3px solid var(--tape);color:var(--steel)}
+.coach-content hr{border:0;border-top:1px solid var(--line);margin:1rem 0}
 .copy{position:absolute;top:.5rem;right:.5rem;background:none;border:0;color:var(--cobalt);font:700 .8rem var(--body);cursor:pointer;padding:.2rem .4rem}
-.bubble.coach .txt{padding-right:2.8rem}
+.bubble.coach .txt{padding-right:0}
 .typing{display:inline-flex;gap:5px;padding:.3rem 0}
 .typing i{width:8px;height:8px;border-radius:50%;background:var(--steel);animation:blip 1s infinite}
 .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
 @keyframes blip{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
 @media(prefers-reduced-motion:reduce){.typing i{animation:none;opacity:.6}}
+@media(max-width:600px){.bubble,.bubble.coach{max-width:100%;padding:.75rem .85rem}.coach-content h1{font-size:1.35rem}.coach-content h2{font-size:1.18rem}}
 .chat-empty{margin:auto;text-align:center;padding-block:1rem}
 .chat-empty .lead{margin:.5rem auto 1.5rem}
 .prompts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.75rem;text-align:left}
