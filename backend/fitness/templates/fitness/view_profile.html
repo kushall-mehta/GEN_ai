@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}My profile | AI Fitness Assistant{% endblock %}
+{% block content %}
+<section class="dash-head"><div class="wrap"><h1>My profile</h1></div></section>
+<div class="wrap dash">
+  <div class="stats">
+    <div class="stat"><b>{{ profile.age }}</b><span>Age</span></div>
+    <div class="stat"><b>{{ profile.height }}</b><span>Height</span></div>
+    <div class="stat"><b>{{ profile.weight }}</b><span>Weight</span></div>
+  </div>
+  <dl class="facts">
+    <div><dt>Goal</dt><dd>{{ profile.get_goal_display }}</dd></div>
+    <div><dt>Activity level</dt><dd>{{ profile.get_activity_level_display }}</dd></div>
+    <div><dt>Experience level</dt><dd>{{ profile.get_experience_level_display }}</dd></div>
+    <div><dt>Trainer</dt><dd>{% if profile.trainer %}<span class="tag tag-on">{{ profile.trainer.user.username }}</span>{% else %}<span class="tag tag-off">Not assigned</span>{% endif %}</dd></div>
+  </dl>
+  <p style="margin-top:1.5rem"><a class="btn btn-primary" href="{% url 'fitness_chat' %}">Ask your coach</a></p>
+</div>
+{% endblock %}

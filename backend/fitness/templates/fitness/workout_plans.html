@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}My Workout Plans | AI Fitness Assistant{% endblock %}
+
+{% block content %}
+<style>
+.plans-page {
+    width: min(900px, 100% - 2.5rem);
+    margin: 2.5rem auto 4rem;
+}
+
+.plans-page > header {
+    margin-bottom: 1.5rem;
+}
+
+.plan-card {
+    margin-top: 1rem;
+    padding: 1.5rem;
+    border: 2px solid var(--ink);
+    border-radius: var(--r);
+    background: var(--paper);
+}
+
+.plan-card h2 {
+    margin-bottom: 1rem;
+}
+
+.plan-details {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.plan-section + .plan-section {
+    margin-top: 1.25rem;
+}
+</style>
+
+<section class="plans-page">
+    <header>
+        <h1>My Workout Plans</h1>
+        <p class="lead">Your saved training plans, all in one place.</p>
+    </header>
+
+    {% if plans %}
+        {% for plan in plans %}
+            <article class="plan-card">
+                <h2>{{ plan.title }}</h2>
+                <section class="plan-section">
+                    <h3>Workout details</h3>
+                    <div class="plan-details">{{ plan.exercises }}</div>
+                </section>
+                {% if plan.schedule %}
+                    <section class="plan-section">
+                        <h3>Schedule</h3>
+                        <div class="plan-details">{{ plan.schedule }}</div>
+                    </section>
+                {% endif %}
+                {% if plan.trainer_notes %}
+                    <section class="plan-section">
+                        <h3>Trainer notes</h3>
+                        <div class="plan-details">{{ plan.trainer_notes }}</div>
+                    </section>
+                {% endif %}
+            </article>
+        {% endfor %}
+    {% else %}
+        <div class="form-card">
+            <h2>No saved workouts yet</h2>
+            <p class="lead" style="margin:.75rem 0 1.5rem">
+                Ask your coach for a workout and choose “Yes, save workout” to keep it here.
+            </p>
+            <a class="btn btn-primary" href="{% url 'fitness_chat' %}">Get a workout</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

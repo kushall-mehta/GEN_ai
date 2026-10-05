@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Join | AI Fitness Assistant{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div class="auth">
+  <aside class="auth-side">
+    <h2>Your first rep starts here.</h2>
+    <p>Create an account, complete your fitness profile and unlock your AI coach.</p>
+  </aside>
+  <section class="auth-main">
+    <div class="auth-card">
+      <h1>Join now</h1>
+      <p class="sub">It takes a minute. Your profile comes next.</p>
+      <form method="post" class="form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary btn-block" type="submit">Create account</button>
+      </form>
+      <p class="alt">Already a member? <a href="{% url 'login' %}">Log in</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

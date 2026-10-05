@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Complete your profile | AI Fitness Assistant{% endblock %}
+{% block content %}
+<div class="narrow">
+  <div class="form-card">
+    <h2>Complete your profile</h2>
+    <p class="lead" style="margin:.75rem 0 1.5rem">Your coach uses these details to tailor every answer. Finishing this unlocks the chat.</p>
+    <form method="post" class="form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-primary btn-block" type="submit">Save and unlock coach</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

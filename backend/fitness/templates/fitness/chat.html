@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+
+{% block title %}Fitness Coach | AI Fitness Assistant{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block content %}
+
+<style>
+.chat {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 64px);
+}
+
+.chat-head {
+    background: var(--iron);
+    color: #F1F2F4;
+    border-bottom: 6px solid var(--tape);
+    padding: 1rem 0;
+}
+
+.chat-head .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.chat-head h1 {
+    font-size: 2.2rem;
+}
+
+.chat-head p {
+    color: #B4BCC8;
+    font-size: .9rem;
+}
+
+.dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #3DDC84;
+}
+
+.ctx {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.ctx li {
+    padding: .2rem .75rem;
+    border: 1.5px solid #5B6573;
+    border-radius: 99px;
+    font-size: .85rem;
+}
+
+.thread {
+    flex: 1;
+    overflow-y: auto;
+    width: min(760px, 100% - 2.5rem);
+    margin-inline: auto;
+    padding: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.bubble {
+    max-width: 88%;
+    padding: .8rem 1.1rem;
+    border-radius: var(--r);
+    background: var(--paper);
+    border: 2px solid var(--line);
+    border-left: 6px solid var(--tape);
+}
+
+.bubble small {
+    display: block;
+    font-weight: 700;
+    color: var(--steel);
+    margin-bottom: .2rem;
+}
+
+.bubble.me {
+    align-self: flex-end;
+    background: var(--cobalt);
+    border-color: var(--cobalt);
+    color: white;
+}
+
+.bubble.me small {
+    color: #DDE4FF;
+}
+
+.txt {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.prompts {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(190px, 1fr)
+    );
+    gap: .75rem;
+    text-align: left;
+}
+
+.prompts button {
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+    padding: 1rem 1.1rem;
+    border: 2px solid var(--ink);
+    border-radius: var(--r);
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+}
+
+.prompts button:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 5px 5px 0 var(--tape);
+}
+
+.prompts span {
+    color: var(--steel);
+    font-size: .85rem;
+}
+
+.composer {
+    background: var(--paper);
+    border-top: 2px solid var(--ink);
+    padding: .9rem 0 .6rem;
+}
+
+.composer .wrap {
+    display: flex;
+    gap: .75rem;
+    align-items: flex-end;
+    max-width: 760px;
+}
+
+.composer textarea {
+    flex: 1;
+    max-height: 9rem;
+    resize: vertical;
+    padding: .75rem .95rem;
+    background: var(--chalk);
+    color: var(--ink);
+    border: 2px solid var(--line);
+    border-radius: var(--r);
+    font: inherit;
+}
+
+.composer textarea:focus {
+    outline: none;
+    border-color: var(--cobalt);
+}
+
+.fine {
+    margin-top: .4rem;
+    font-size: .78rem;
+    color: var(--steel);
+}
+
+.save-workout {
+    align-self: center;
+    width: min(100%, 760px);
+    padding: 1rem;
+    border: 2px solid var(--ink);
+    border-radius: var(--r);
+    background: var(--paper);
+}
+
+.save-workout p {
+    margin-bottom: .75rem;
+    font-weight: 700;
+}
+
+.save-workout form {
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+</style>
+
+
+{% if not profile %}
+
+<div class="narrow">
+
+    <div class="form-card">
+
+        <h2>Coach locked</h2>
+
+        <p class="lead" style="margin:.75rem 0 1.5rem">
+            Complete your fitness profile and your coach
+            unlocks right away.
+        </p>
+
+        <a
+            class="btn btn-tape"
+            href="{% url 'fitness_profile' %}"
+        >
+            Complete profile
+        </a>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="chat">
+
+    <!-- CHAT HEADER -->
+
+    <header class="chat-head">
+
+        <div class="wrap">
+
+            <div>
+
+                <h1>Your Coach</h1>
+
+                <p>
+                    <span class="dot"></span>
+                    Online. Answers use your profile.
+                </p>
+
+            </div>
+
+
+            <ul
+                class="ctx"
+                aria-label="Profile information"
+            >
+
+                <li>
+                    {{ profile.goal }}
+                </li>
+
+                <li>
+                    {{ profile.experience_level }}
+                </li>
+
+                <li>
+                    {{ profile.height }} cm
+                </li>
+
+                <li>
+                    {{ profile.weight }} kg
+                </li>
+
+            </ul>
+
+        </div>
+
+    </header>
+
+
+    <!-- CHAT MESSAGES -->
+
+    <div class="thread">
+
+        {% for message in history %}
+
+            <div
+                class="bubble
+                {% if message.role == 'user' %}
+                    me
+                {% endif %}"
+            >
+
+                <small>
+
+                    {% if message.role == 'user' %}
+                        You
+                    {% else %}
+                        Coach
+                    {% endif %}
+
+                </small>
+
+                <div class="txt">
+                    {{ message.content }}
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            {% if response %}
+
+                <div class="bubble">
+
+                    <small>Coach</small>
+
+                    <div class="txt">
+                        {{ response }}
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="chat-empty">
+
+                    <h2>
+                        What are we working on?
+                    </h2>
+
+                    <p class="lead">
+                        Pick a starter or type your own question.
+                    </p>
+
+
+                    <!-- STARTER QUESTIONS -->
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <div class="prompts">
+
+                            <button
+                                type="submit"
+                                name="message"
+                                value="Build me a workout plan for my goal."
+                            >
+                                <b>Workout plan</b>
+                                <span>
+                                    A routine built for your level
+                                </span>
+                            </button>
+
+
+                            <button
+                                type="submit"
+                                name="message"
+                                value="What should I eat to reach my goal?"
+                            >
+                                <b>Diet advice</b>
+                                <span>
+                                    Food choices for your goal
+                                </span>
+                            </button>
+
+
+                            <button
+                                type="submit"
+                                name="message"
+                                value="What is my BMI and what does it mean?"
+                            >
+                                <b>Check my BMI</b>
+                                <span>
+                                    Your number, explained
+                                </span>
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            {% endif %}
+
+        {% endfor %}
+
+        {% if pending_workout %}
+            <section class="save-workout" aria-label="Save workout">
+                <p>Would you like to save this workout to your workout plans?</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit" name="workout_action" value="save">
+                        Yes, save workout
+                    </button>
+                    <button class="btn" type="submit" name="workout_action" value="discard">
+                        No, thanks
+                    </button>
+                </form>
+            </section>
+        {% endif %}
+
+    </div>
+
+
+    <!-- MESSAGE INPUT -->
+
+    <form
+        method="post"
+        class="composer"
+    >
+
+        {% csrf_token %}
+
+        <div class="wrap">
+
+            <textarea
+                name="message"
+                rows="2"
+                maxlength="1000"
+                placeholder="Ask your fitness question"
+                required
+            ></textarea>
+
+            <button
+                class="btn btn-primary"
+                type="submit"
+            >
+                Send
+            </button>
+
+        </div>
+
+        <p class="fine wrap">
+            General guidance only, not medical advice.
+        </p>
+
+    </form>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AI Fitness Assistant{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="{% url 'home' %}"><svg class="plate" viewBox="0 0 200 200" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="100" cy="100" r="94" stroke-width="10"/><circle cx="100" cy="100" r="70" stroke-width="3"/><circle cx="100" cy="100" r="34" stroke-width="10"/><circle cx="100" cy="100" r="9" fill="currentColor"/><path d="M100 6v28M100 166v28M6 100h28M166 100h28" stroke-width="6"/></svg> AI Fitness Assistant</a>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    <nav class="nav-links">
+      {% if user.is_authenticated %}
+        <a href="{% url 'user_dashboard' %}">Dashboard</a>
+        <a href="{% url 'workout_plans' %}">Workout plans</a>
+        <a href="{% url 'fitness_profile' %}">Fitness profile</a>
+        <a class="btn btn-sm" href="{% url 'logout' %}">Log out</a>
+      {% else %}
+        <a href="{% url 'login' %}">Log in</a>
+        <a class="btn btn-tape btn-sm" href="{% url 'register' %}">Join now</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+{% if messages %}{% for m in messages %}<div class="msg"><div class="wrap">{{ m }}</div></div>{% endfor %}{% endif %}
+<main>{% block content %}{% endblock %}</main>
+{% block footer %}<footer class="footer"><div class="wrap">&copy; AI Fitness Assistant</div></footer>{% endblock %}
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

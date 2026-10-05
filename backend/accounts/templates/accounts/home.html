@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Train smarter. Ask anything.</h1>
+      <p class="lead">Tell us about your body and your goal. Your AI coach builds workouts, diet advice and BMI guidance around your numbers.</p>
+      <div class="hero-actions">
+        {% if user.is_authenticated %}
+          <a class="btn btn-tape" href="{% url 'user_dashboard' %}">Open dashboard</a>
+        {% else %}
+          <a class="btn btn-tape" href="{% url 'register' %}">Join now</a>
+          <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="plate-art"><svg viewBox="0 0 200 200" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="100" cy="100" r="94" stroke-width="10"/><circle cx="100" cy="100" r="70" stroke-width="3"/><circle cx="100" cy="100" r="34" stroke-width="10"/><circle cx="100" cy="100" r="9" fill="currentColor"/><path d="M100 6v28M100 166v28M6 100h28M166 100h28" stroke-width="6"/></svg></div>
+  </div>
+</section>
+<div class="tape-strip"></div>
+<section class="features wrap">
+  <h2>Three steps to your coach</h2>
+  <div class="feature-list">
+    <div><h3>1. Create an account</h3><p>Register as a member or a trainer in under a minute.</p></div>
+    <div><h3>2. Complete your profile</h3><p>Age, height, weight, goal and experience. This unlocks the coach.</p></div>
+    <div><h3>3. Start chatting</h3><p>Ask about workouts, diet or BMI and keep the conversation going.</p></div>
+  </div>
+</section>
+{% endblock %}

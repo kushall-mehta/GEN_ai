@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Log in | AI Fitness Assistant{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div class="auth">
+  <aside class="auth-side">
+    <h2>Back for another session?</h2>
+    <p>Your plan is waiting. Pick up where you left off.</p>
+  </aside>
+  <section class="auth-main">
+    <div class="auth-card">
+      <h1>Log in</h1>
+      <p class="sub">Enter your details to open your dashboard.</p>
+      {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+      <form method="post" class="form">
+        {% csrf_token %}
+        <div class="field"><label for="username">Username</label>
+          <input id="username" type="text" name="username" autocomplete="username" required autofocus></div>
+        <div class="field"><label for="password">Password</label>
+          <div class="pw"><input id="password" type="password" name="password" autocomplete="current-password" required>
+          <button type="button">Show</button></div></div>
+        <button class="btn btn-primary btn-block" type="submit">Log in</button>
+      </form>
+      <p class="alt">New here? <a href="{% url 'register' %}">Create an account</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | AI Fitness Assistant{% endblock %}
+{% block content %}
+<section class="dash-head"><div class="wrap">
+  <h1>Hi, {{ user.username }}</h1>
+  <span class="chip">{{ user.role }}</span>
+</div></section>
+<div class="wrap dash">
+  <ol class="steps">
+    <li class="step done"><b>Account</b><span>Created</span></li>
+    <li class="step {% if profile %}done{% else %}now{% endif %}"><b>Fitness profile</b><span>{% if profile %}Complete{% else %}Complete it to unlock your coach{% endif %}</span></li>
+    <li class="step {% if profile %}done{% endif %}"><b>Fitness coach</b><span>{% if profile %}Unlocked{% else %}Locked{% endif %}</span></li>
+  </ol>
+  <div class="tiles">
+    {% if profile %}
+    <a class="tile" href="{% url 'fitness_chat' %}"><div><h3>Fitness coach</h3><p>Ask about workouts, diet or BMI.</p></div><span class="go">Open chat</span></a>
+    {% else %}
+    <a class="tile tile-locked" href="{% url 'fitness_profile' %}"><div><h3>Fitness coach</h3><p>Locked until your fitness profile is complete.</p></div><span class="go">Complete profile to unlock</span></a>
+    {% endif %}
+    <a class="tile" href="{% url 'fitness_profile' %}"><div><h3>Fitness profile</h3><p>Your age, body stats, goal and trainer.</p></div><span class="go">{% if profile %}View profile{% else %}Create profile{% endif %}</span></a>
+    <a class="tile" href="{% url 'workout_plans' %}"><div><h3>Workout plans</h3><p>Plans assigned by your trainer.</p></div><span class="go">View plans</span></a>
+  </div>
+</div>
+{% endblock %}
