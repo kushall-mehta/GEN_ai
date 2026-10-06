@@ -33,8 +33,8 @@ Experience Level: {state["experience_level"]}
         state.get("messages", []),
         question,
     )
-    documents = get_retriever("workout").invoke(retrieval_query)
-
+    documents = get_retriever("workout").invoke(retrieval_query) #to llm
+    # ret data
     context = "\n\n".join(
         f"[Source: {document.metadata.get('source', 'unknown')}, "
         f"page: {document.metadata.get('page', 0) + 1}]\n{document.page_content}"

@@ -24,9 +24,10 @@ def home():
 @traceable(
     name="Fitness chat request",
     run_type="chain",
-    process_inputs=lambda _: {"request": "[redacted]"},
+    process_inputs=lambda _: {"request": "[redacted]"},#intentionally hiding the actual input/output from LangSmith.
     process_outputs=lambda _: {"response": "[redacted]"},
 )
+#This is very important for your conversation memory. for graph #MemorySaver() used
 def chat(request: ChatRequest):
 
     config = {
@@ -44,7 +45,7 @@ def chat(request: ChatRequest):
             "goal": request.goal,
             "activity_level": request.activity_level,
             "experience_level": request.experience_level
-        },
+        },#helps identify/filter runs in LangSmith.
         config={
             **config,
             "tags": ["fitness-api"],

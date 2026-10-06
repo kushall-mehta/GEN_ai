@@ -32,6 +32,8 @@ def format_chat_history(messages: list[BaseMessage]) -> str:
         for message in previous_messages
     )
 
+#
+# 100 messages stored # messages[-7:-1] #only 6 message shown
 def build_retrieval_query(messages: list[BaseMessage], question: str) -> str:
     # Add recent user questions so short follow-ups retrieve the right knowledge.
     previous_questions = [

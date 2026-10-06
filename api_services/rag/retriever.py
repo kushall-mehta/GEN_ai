@@ -37,19 +37,25 @@ vector_store = PGVector(
     embeddings=embeddings,
     collection_name=COLLECTION_NAME,
     connection=DATABASE_URL,
-    use_jsonb=True,
+    use_jsonb=True, #Store document metadata using PostgreSQL's JSONB type b= binary/optimized format.
 )
 
 # Keep the original unfiltered retriever here as a reference.
-# retriever = vector_store.as_retriever(
+# retriever = vector_store.as_retriever(s
 #     search_kwargs={"k": 4}
 # )
 
 def get_retriever(category: Literal["diet", "workout"]):
     # Only return chunks that belong to the requested PDF category.
     return vector_store.as_retriever(
-        search_kwargs={
+        search_kwargs={ #it gives us a searcher that we can use later on
             "k": 4,
             "filter": {"category": category},
         }
     )
+#
+# as_retriever()
+#
+# You ask the vector database:
+#
+# "Give me a searcher that I can use later."

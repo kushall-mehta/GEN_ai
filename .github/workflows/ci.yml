@@ -65,7 +65,7 @@ jobs:
           python - <<'PY'
           import sys
           from types import ModuleType
-          from unittest.mock import patch
+          from unittest.mock import patch      #patch → lets us temporarily replace something during the test.
 
           import langchain_postgres
 
