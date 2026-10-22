@@ -43,7 +43,7 @@ def ingest_knowledge():
         ids = [
             hashlib.sha256(
                 (
-                    f"{category}:"
+                    f"{COLLECTION_NAME}:{category}:"
                     f"{chunk.metadata['source']}:"
                     f"{chunk.metadata['page']}:"
                     f"{chunk.page_content}"
@@ -65,5 +65,5 @@ def ingest_knowledge():
         )
 
 
-# if __name__ == "__main__":
-#     ingest_knowledge()
+if __name__ == "__main__":
+    ingest_knowledge()
