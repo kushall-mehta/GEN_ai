@@ -108,5 +108,6 @@ def diet_node(state):
     response = llm.invoke(prompt)
 
     return {
-        "response": response.content
+        "response": response.text
     }
+

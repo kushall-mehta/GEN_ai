@@ -433,5 +433,5 @@ personalize it.
     response = llm.invoke(prompt)
 
     return {
-        "response": response.content
+        "response": response.text
     }

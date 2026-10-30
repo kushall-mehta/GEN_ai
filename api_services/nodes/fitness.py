@@ -37,5 +37,5 @@ Give a helpful and personalized fitness answer.
     response = llm.invoke(prompt)
 
     return {
-        "response": response.content
+        "response": response.text
     }

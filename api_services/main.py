@@ -2,6 +2,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from groq import APIError
+import requests
 from langsmith import traceable
 
 # Load tracing and model settings before importing modules that create clients.
@@ -13,6 +16,17 @@ from schemas import ChatRequest
 from graph import graph
 
 app = FastAPI()
+
+
+@app.exception_handler(APIError)
+async def groq_error_handler(request, exc):
+    return JSONResponse(status_code=502, content={"detail": "Groq could not complete the request. Please try again."})
+
+
+@app.exception_handler(requests.RequestException)
+async def retrieval_error_handler(request, exc):
+    return JSONResponse(status_code=502, content={"detail": "The knowledge service is temporarily unavailable. Please try again."})
+
 
 
 @app.get("/")

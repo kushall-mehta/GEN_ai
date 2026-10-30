@@ -111,7 +111,7 @@ if DATABASE_ENGINE == "postgresql":
             "HOST": os.getenv("DJANGO_DB_HOST", ""),
             "PORT": os.getenv("DJANGO_DB_PORT", "5432"),
             "CONN_MAX_AGE": 60,
-            "OPTIONS": {"sslmode": "require"},
+            "OPTIONS": {"sslmode": os.getenv("DJANGO_DB_SSLMODE", "require")},
         }
     }
 elif DATABASE_ENGINE == "sqlite":
@@ -195,3 +195,4 @@ MAILERS = {
 AUTH_USER_MODEL = "accounts.User" ##this is out side from installed app so we have  to tell django that user model will be there
 
 LOGIN_URL = "/login/" #"This will be the login page "
+

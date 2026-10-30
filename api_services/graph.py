@@ -23,6 +23,7 @@ def message_node(state):
 
 def save_response_node(state):
     return {
+
         "messages": [
             AIMessage(content=state["response"])
         ]

@@ -6,6 +6,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
       POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -21,6 +23,8 @@ services:
     restart: unless-stopped
     env_file:
       - path: ./api_services/.env
+        required: true
+      - path: ./.env
         required: true
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -57,6 +61,7 @@ services:
       DJANGO_DB_PASSWORD: ${POSTGRES_PASSWORD}
       DJANGO_DB_HOST: db
       DJANGO_DB_PORT: 5432
+      DJANGO_DB_SSLMODE: disable
       AI_API_URL: http://ai-api:8081/chat
     ports:
       - "8000:8000"
@@ -78,3 +83,6 @@ services:
 
 volumes:
   postgres_data:
+
+
+
