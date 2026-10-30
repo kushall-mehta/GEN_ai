@@ -6,6 +6,7 @@
 
 # Python
 .venv/
+.vercel/
 venv/
 __pycache__/
 **/__pycache__/

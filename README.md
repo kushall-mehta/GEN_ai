@@ -1,5 +1,7 @@
 # Local Docker setup
 
+For migration from Render, see [Vercel deployment](VERCEL.md).
+
 1. Copy `.env.example` to `.env` and set a random `DJANGO_SECRET_KEY` and a
    strong alphanumeric `POSTGRES_PASSWORD`. Keep `api_services/.env` populated
    with `GEMINI_API_KEY`, `GROQ_API_KEY`, and optional LangSmith settings;
