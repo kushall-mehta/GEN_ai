@@ -2,6 +2,20 @@ def router_node(state):
 
     message = state["message"].lower()
 
+    # Keep unrelated requests out of the generative nodes. Prompt text and
+    # conversation history are user supplied data, never policy overrides.
+    fitness_keywords = (
+        "fitness", "workout", "exercise", "training", "train", "gym",
+        "strength", "cardio", "warm-up", "warm up", "cool-down",
+        "cool down", "stretch", "flexibility", "recovery", "muscle",
+        "lifting", "weights", "squat", "deadlift", "push-up", "push up",
+        "reps", "sets", "diet", "food", "nutrition", "eat", "meal",
+        "breakfast", "lunch", "dinner", "protein", "calorie", "bmi",
+        "body composition", "weight loss", "muscle gain", "healthy eating",
+    )
+    if not any(keyword in message for keyword in fitness_keywords):
+        return {"intent": "out_of_scope"}
+
 
     # Keep the original routing checks here as a reference.
     # Route nutrition questions before workout questions when both topics are mentioned.

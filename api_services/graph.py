@@ -21,6 +21,12 @@ def message_node(state):
     }
 
 
+def out_of_scope_node(state):
+    return {
+        "response": "I can help with fitness, workouts, nutrition, and related wellness questions. Please ask me something in those areas."
+    }
+
+
 def save_response_node(state):
     return {
         "messages": [
@@ -65,6 +71,7 @@ graph_builder.add_node(
     "bmi",
     bmi_node
 )
+graph_builder.add_node("out_of_scope", out_of_scope_node)
 
 graph_builder.add_node(
     "save_response",
@@ -103,6 +110,7 @@ graph_builder.add_conditional_edges(
         "workout": "workout",
         "fitness": "fitness",
         "bmi": "bmi"
+        ,"out_of_scope": "out_of_scope"
     }
 )
 
@@ -132,6 +140,7 @@ graph_builder.add_edge(
     "bmi",
     "save_response"
 )
+graph_builder.add_edge("out_of_scope", "save_response")
 
 # SAVE RESPONSE → END
 
