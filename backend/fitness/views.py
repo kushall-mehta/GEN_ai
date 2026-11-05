@@ -142,6 +142,7 @@ def fitness_chat(request):
         try:
             response = requests.post(
                 settings.AI_API_URL,
+                headers={"X-AI-API-Key": settings.AI_API_KEY} if settings.AI_API_KEY else {},
                 json={
                     "session_id": session_id,
                     "message": message,

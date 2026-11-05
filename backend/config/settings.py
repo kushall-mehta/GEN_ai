@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlsplit
 
 from dotenv import load_dotenv
 
@@ -28,7 +29,8 @@ load_dotenv(PROJECT_ROOT / ".env")
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-local-development-only")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "True").strip().lower() in {"1", "true", "yes", "on"}
+ON_VERCEL = os.getenv("VERCEL") == "1"
+DEBUG = os.getenv("DJANGO_DEBUG", "False" if ON_VERCEL else "True").strip().lower() in {"1", "true", "yes", "on"}
 
 # Keep the default empty allowlist here as a reference.
 # ALLOWED_HOSTS = []
@@ -50,14 +52,17 @@ CSRF_TRUSTED_ORIGINS = [
     for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
-# Vercel assigns a new hostname to each deployment. Trust only the hostnames
-# supplied by the platform, rather than every tenant under vercel.app.
-if os.getenv("VERCEL") == "1":
-    for variable in ("VERCEL_URL", "VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_BRANCH_URL"):
-        deployment_host = os.getenv(variable, "").strip()
-        if deployment_host and deployment_host not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(deployment_host)
 AI_API_URL = os.getenv("AI_API_URL", "http://127.0.0.1:8081/chat")
+AI_API_KEY = os.getenv("AI_API_KEY", "")
+
+# Include only this project's deployment hostnames, never a wildcard for all Vercel apps.
+if ON_VERCEL:
+    for name in ("VERCEL_URL", "VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_BRANCH_URL"):
+        host = os.getenv(name)
+        if host:
+            ALLOWED_HOSTS.append(host)
+            CSRF_TRUSTED_ORIGINS.append(f"https://{host}")
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
@@ -108,7 +113,26 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASE_ENGINE = os.getenv("DJANGO_DB_ENGINE", "sqlite").strip().lower()
-if DATABASE_ENGINE == "postgresql":
+database_url = os.getenv("DATABASE_URL", "")
+if database_url:
+    url = urlsplit(database_url)
+    if url.scheme not in {"postgres", "postgresql", "postgresql+psycopg"}:
+        raise RuntimeError("DATABASE_URL must be a PostgreSQL URL.")
+    query = parse_qs(url.query)
+    DATABASES = {"default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": unquote(url.path.lstrip("/")),
+        "USER": unquote(url.username or ""),
+        "PASSWORD": unquote(url.password or ""),
+        "HOST": url.hostname,
+        "PORT": url.port or 5432,
+        "CONN_MAX_AGE": 0 if ON_VERCEL else 60,
+        "OPTIONS": {
+            "sslmode": query.get("sslmode", ["require"])[0],
+            **{key: query[key][0] for key in ("channel_binding", "connect_timeout") if key in query},
+        },
+    }}
+elif DATABASE_ENGINE == "postgresql":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -117,11 +141,13 @@ if DATABASE_ENGINE == "postgresql":
             "PASSWORD": os.getenv("DJANGO_DB_PASSWORD", ""),
             "HOST": os.getenv("DJANGO_DB_HOST", ""),
             "PORT": os.getenv("DJANGO_DB_PORT", "5432"),
-            "CONN_MAX_AGE": 60,
+            "CONN_MAX_AGE": 0 if ON_VERCEL else 60,
             "OPTIONS": {"sslmode": "require"},
         }
     }
 elif DATABASE_ENGINE == "sqlite":
+    if ON_VERCEL:
+        raise RuntimeError("Configure Neon DATABASE_URL on Vercel; SQLite is not persistent there.")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
