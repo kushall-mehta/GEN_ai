@@ -62,17 +62,23 @@ def _save_pending_workout(request):
 
 @login_required
 def fitness_profile(request):
+    if request.user.role == "trainer":
+        return redirect("trainer_dashboard")
 
     try:
         profile = FitnessProfile.objects.get(
             user=request.user
         )
 
-        return render(
-            request,
-            "fitness/view_profile.html",
-            {"profile": profile}
-        )
+        if request.method == "POST":
+            form = FitnessProfileForm(request.POST, instance=profile)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Your fitness profile was updated.")
+                return redirect("fitness_profile")
+        else:
+            form = FitnessProfileForm(instance=profile)
+        return render(request, "fitness/view_profile.html", {"profile": profile, "form": form})
 
     except FitnessProfile.DoesNotExist:
 
@@ -246,6 +252,17 @@ def fitness_chat(request):
             "pending_workout": request.session.get("pending_workout"),
         }
     )
+
+
+@login_required
+def new_fitness_chat(request):
+    if request.method != "POST":
+        return redirect("fitness_chat")
+    if request.user.role == "trainer":
+        return redirect("trainer_dashboard")
+    request.session["fitness_session_id"] = str(uuid.uuid4())
+    request.session.pop("pending_workout", None)
+    return redirect("fitness_chat")
 @login_required
 def workout_plans(request):
     plans = WorkoutPlan.objects.filter(user=request.user)

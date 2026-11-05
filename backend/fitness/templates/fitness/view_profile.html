@@ -14,6 +14,7 @@
     <div><dt>Experience level</dt><dd>{{ profile.get_experience_level_display }}</dd></div>
     <div><dt>Trainer</dt><dd>{% if profile.trainer %}<span class="tag tag-on">{{ profile.trainer.user.username }}</span>{% else %}<span class="tag tag-off">Not assigned</span>{% endif %}</dd></div>
   </dl>
-  <p style="margin-top:1.5rem"><a class="btn btn-primary" href="{% url 'fitness_chat' %}">Ask your coach</a></p>
+  <p style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap"><a class="btn btn-primary" href="{% url 'fitness_chat' %}">Ask your coach</a><a class="btn" href="#edit-profile">Edit profile</a></p>
 </div>
+<div class="narrow" id="edit-profile"><div class="form-card"><h2>Edit your fitness profile</h2><p class="lead" style="margin:.75rem 0 1.5rem">Your trainer assignment can only be changed by a trainer.</p><form method="post" class="form">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary btn-block" type="submit">Save changes</button></form></div></div>
 {% endblock %}

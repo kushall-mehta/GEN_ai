@@ -259,6 +259,11 @@
 
                 <h1>Your Coach</h1>
 
+                <form method="post" action="{% url 'new_fitness_chat' %}" style="margin:.5rem 0">
+                    {% csrf_token %}
+                    <button class="btn btn-sm" type="submit">＋ New chat</button>
+                </form>
+
                 <p>
                     <span class="dot"></span>
                     Online. Answers use your profile.

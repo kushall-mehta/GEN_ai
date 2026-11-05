@@ -18,7 +18,7 @@
 
     document.addEventListener('submit', async (event) => {
         const form = event.target;
-        if (!form.matches('.chat form') || form.querySelector('[name="workout_action"]')) return;
+        if (!form.matches('.chat form') || form.querySelector('[name="workout_action"], [name="new_chat"]')) return;
         event.preventDefault();
         if (activeRequest) return;
 

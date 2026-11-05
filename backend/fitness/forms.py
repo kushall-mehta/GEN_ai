@@ -12,5 +12,4 @@ class FitnessProfileForm(forms.ModelForm):
             "goal",
             "activity_level",
             "experience_level",
-            'trainer'
         ]
