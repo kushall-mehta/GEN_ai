@@ -1,6 +1,7 @@
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.graph import StateGraph, START, END
 from state import FitnessState
+from scope_policy import REFUSAL, EMERGENCY_RESPONSE
 
 # from nodes.router import *
 from nodes.router import router_node, route_intent
@@ -22,9 +23,11 @@ def message_node(state):
 
 
 def out_of_scope_node(state):
-    return {
-        "response": "I can help with fitness, workouts, nutrition, and related wellness questions. Please ask me something in those areas."
-    }
+    return {"response": REFUSAL}
+
+
+def emergency_node(state):
+    return {"response": EMERGENCY_RESPONSE}
 
 
 def save_response_node(state):
@@ -72,6 +75,7 @@ graph_builder.add_node(
     bmi_node
 )
 graph_builder.add_node("out_of_scope", out_of_scope_node)
+graph_builder.add_node("emergency", emergency_node)
 
 graph_builder.add_node(
     "save_response",
@@ -109,8 +113,9 @@ graph_builder.add_conditional_edges(
         "diet": "diet",
         "workout": "workout",
         "fitness": "fitness",
-        "bmi": "bmi"
-        ,"out_of_scope": "out_of_scope"
+        "bmi": "bmi",
+        "out_of_scope": "out_of_scope",
+        "emergency": "emergency",
     }
 )
 
@@ -141,6 +146,7 @@ graph_builder.add_edge(
     "save_response"
 )
 graph_builder.add_edge("out_of_scope", "save_response")
+graph_builder.add_edge("emergency", "save_response")
 
 # SAVE RESPONSE → END
 
@@ -164,7 +170,7 @@ graph = graph_builder.compile(
 
 # SHOW GRAPH AS MERMAID
 
-print(graph.get_graph().draw_mermaid())
+# Inspect graph.get_graph().draw_mermaid() explicitly when debugging locally.
 
 # --------------------------------------------------
 # CONVERSATION FLOW

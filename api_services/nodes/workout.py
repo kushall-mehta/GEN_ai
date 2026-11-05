@@ -1,3 +1,5 @@
+from langchain_core.messages import SystemMessage, HumanMessage
+from scope_policy import COACH_SYSTEM_PROMPT
 from llm.groq import llm
 from rag.retriever import get_retriever
 from nodes.bmi import calculate_bmi  # adjust path to where your bmi file lives
@@ -432,7 +434,7 @@ Do not give a generic workout when the profile allows you to
 personalize it.
 """
 
-    response = llm.invoke(prompt)
+    response = llm.invoke([SystemMessage(content=COACH_SYSTEM_PROMPT), HumanMessage(content=prompt)])
 
     return {
         "response": response.content

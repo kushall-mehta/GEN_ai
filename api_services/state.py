@@ -14,6 +14,7 @@ class FitnessState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages] #When a new message comes in, add it to the existing conversation history
 
     intent: str
+    last_supported_intent: str
     response: str
 
     age: int

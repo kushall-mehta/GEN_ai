@@ -1,3 +1,5 @@
+from langchain_core.messages import SystemMessage, HumanMessage
+from scope_policy import COACH_SYSTEM_PROMPT
 from llm.groq import llm
 
 from state import format_chat_history
@@ -39,7 +41,7 @@ Do not ask for profile information again if it is already available.
 Give a helpful and personalized fitness answer.
 """
 
-    response = llm.invoke(prompt)
+    response = llm.invoke([SystemMessage(content=COACH_SYSTEM_PROMPT), HumanMessage(content=prompt)])
 
     return {
         "response": response.content

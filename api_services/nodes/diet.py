@@ -1,3 +1,5 @@
+from langchain_core.messages import SystemMessage, HumanMessage
+from scope_policy import COACH_SYSTEM_PROMPT
 from llm.groq import llm
 # from rag.retriever import retriever
 from rag.retriever import get_retriever
@@ -107,7 +109,7 @@ def diet_node(state):
     Using the rules above, give the user a clear, practical, and motivating answer — 
     as if you were personally prepping their meals for the week.
     """
-    response = llm.invoke(prompt)
+    response = llm.invoke([SystemMessage(content=COACH_SYSTEM_PROMPT), HumanMessage(content=prompt)])
 
     return {
         "response": response.content

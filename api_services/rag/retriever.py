@@ -14,6 +14,10 @@ load_dotenv(dotenv_path=ENV_FILE.parents[1] / ".env")
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError(f"DATABASE_URL is missing from {ENV_FILE}")
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 #
 # CONNECTION = "postgresql+psycopg://postgres:postgres@localhost:5433/gym_ai"
 
