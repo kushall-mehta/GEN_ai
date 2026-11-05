@@ -2,6 +2,16 @@ def router_node(state):
 
     message = state["message"].lower()
 
+    # A clear change of topic must not inherit a previous fitness intent.
+    # Check travel requests before fitness keywords and conversation follow-ups.
+    travel_keywords = (
+        "visit", "places to go", "places to see", "tourist", "tourism",
+        "sightseeing", "attractions", "travel to", "trip to", "things to do",
+        "best place", "where should i go", "what to see", "city to visit",
+    )
+    if any(keyword in message for keyword in travel_keywords):
+        return {"intent": "out_of_scope"}
+
     # Keep unrelated requests out of the generative nodes. Prompt text and
     # conversation history are user supplied data, never policy overrides.
     fitness_keywords = (
