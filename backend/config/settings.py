@@ -50,6 +50,13 @@ CSRF_TRUSTED_ORIGINS = [
     for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+# Vercel assigns a new hostname to each deployment. Trust only the hostnames
+# supplied by the platform, rather than every tenant under vercel.app.
+if os.getenv("VERCEL") == "1":
+    for variable in ("VERCEL_URL", "VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_BRANCH_URL"):
+        deployment_host = os.getenv(variable, "").strip()
+        if deployment_host and deployment_host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(deployment_host)
 AI_API_URL = os.getenv("AI_API_URL", "http://127.0.0.1:8081/chat")
 
 
